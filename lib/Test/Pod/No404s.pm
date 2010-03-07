@@ -178,6 +178,20 @@ L<Pod::Simple>
 
 L<Test::Pod>
 
+=head1 Possible ideas for the future
+
+=over 4
+
+=item * CPAN module link 404s
+
+<ribasushi> Apocal: was looking at your 404 pod module
+<Apocal> hehe
+<ribasushi> Apocal: is there any practical way to extend it to detect cpan 404s? i.e. you say L<some_module/something>
+<ribasushi> to detect if *these* links are dead
+<Apocal> Hmm yeah that would be super-useful
+
+=back
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
