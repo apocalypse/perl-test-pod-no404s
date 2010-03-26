@@ -4,31 +4,21 @@ use strict; use warnings;
 
 # Initialize our version
 use vars qw( $VERSION );
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 # Import the modules we need
 use Pod::Simple::Text;
 use LWP::UserAgent;
 use URI::Find;
-require Test::Pod;
+use Test::Pod ();
 
 # setup our tests and etc
 use Test::Builder;
 my $Test = Test::Builder->new;
 
-# Thanks to Test::Pod for much of the code here!
-sub import {
-	my $self = shift;
-	my $caller = caller;
-
-	for my $func ( qw( pod_file_ok all_pod_files_ok ) ) {
-		no strict 'refs';	## no critic ( ProhibitNoStrict )
-		*{$caller."::".$func} = \&$func;
-	}
-
-	$Test->exported_to($caller);
-	$Test->plan(@_);
-}
+# auto-export our 2 subs
+use base qw( Exporter );
+our @EXPORT = qw( pod_file_ok all_pod_files_ok ); ## no critic ( ProhibitAutomaticExportation )
 
 sub pod_file_ok {
 	my $file = shift;
@@ -81,13 +71,9 @@ sub pod_file_ok {
 				}
 			}
 
-			if ( $ok ) {
-				$Test->ok( 1, $name );
-			} else {
-				$Test->ok( 0, $name );
-				foreach my $e ( @errors ) {
-					$Test->diag( "Error retrieving '$e->[0]': $e->[1]" );
-				}
+			$Test->ok( $ok, $name );
+			foreach my $e ( @errors ) {
+				$Test->diag( "Error retrieving '$e->[0]': $e->[1]" );
 			}
 		} else {
 			$Test->ok( 1, $name );
@@ -115,7 +101,7 @@ sub all_pod_files_ok {
 1;
 __END__
 
-=for stopwords LWP Kwalitee TESTNAME env internet
+=for stopwords LWP Kwalitee TESTNAME env internet AnnoCPAN Apocal CPAN CPANTS Hmm RT cpan hehe http
 
 =head1 NAME
 
@@ -178,6 +164,8 @@ L<Pod::Simple>
 
 L<Test::Pod>
 
+L<URI::Find>
+
 =head1 Possible ideas for the future
 
 =over 4
@@ -196,7 +184,7 @@ L<Test::Pod>
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Test::Pod::No404s
+	perldoc Test::Pod::No404s
 
 =head2 Websites
 

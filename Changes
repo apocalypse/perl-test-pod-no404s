@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::Pod::No404s
 
+* 0.02
+
+	Minor code fixes
+	Fix incorrect Build.PL
+	Re-jigged the export logic so it's more saner
+
 * 0.01
 
 	initial release
