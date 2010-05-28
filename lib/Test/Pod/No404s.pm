@@ -178,6 +178,8 @@ L<Test::Pod>
 
 L<URI::Find>
 
+L<Test::Pod::LinkCheck>
+
 =head1 Possible ideas for the future
 
 =over 4
