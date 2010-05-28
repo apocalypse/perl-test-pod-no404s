@@ -4,7 +4,7 @@ use strict; use warnings;
 
 # Initialize our version
 use vars qw( $VERSION );
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # Import the modules we need
 use Pod::Simple::Text;
@@ -34,12 +34,22 @@ sub pod_file_ok {
 	my $parser = Pod::Simple::Text->new;
 	my $output;
 	$parser->output_string( \$output );
+	$parser->complain_stderr( 0 );
+	$parser->no_errata_section( 0 );
+	$parser->no_whining( 0 );
 	$parser->parse_file( $file );
 
 	# is POD well-formed?
 	if ( $parser->any_errata_seen ) {
 		$Test->ok( 0, $name );
 		$Test->diag( "Unable to parse POD in $file" );
+
+		# TODO ugly, but there is no other way to get at it?
+		foreach my $l ( keys %{ $parser->{errata} } ) {
+			$Test->diag( " * errors seen in line $l:" );
+			$Test->diag( "   * $_" ) for @{ $parser->{errata}{$l} };
+		}
+
 		return 0;
 	}
 
@@ -129,6 +139,8 @@ Using this test module will check your POD for any http 404 links.
 
 This module looks for any http(s) links in your POD and verifies that they will not return a 404. It uses L<LWP::UserAgent> for the heavy
 lifting, and simply lets you know if it failed to retrieve the document. More specifically, it uses $response->is_error as the "test."
+
+This module does B<NOT> check "pod" or "man" links like C<LE<lt>Test::PodE<gt>> in your pod. For that, please check out L<Test::Pod::LinkCheck>.
 
 Normally, you wouldn't want this test to be run during end-user installation because they might have no internet! It is HIGHLY recommended
 that this be used only for module authors' RELEASE_TESTING phase. To do that, just modify the synopsis to add an env check :)
