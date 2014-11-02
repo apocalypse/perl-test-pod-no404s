@@ -7,6 +7,7 @@ use Pod::Simple::Text;
 use LWP::UserAgent;
 use URI::Find;
 use Test::Pod ();
+use List::MoreUtils qw( any );
 
 # setup our tests and etc
 use Test::Builder;
@@ -76,7 +77,7 @@ sub pod_file_ok {
 			my $scheme = $uri->scheme;
 			if ( defined $scheme and ( $scheme eq 'http' or $scheme eq 'https' ) ) {
 				# Make sure we have unique links...
-				if ( ! grep { $_->eq( $uri ) } @links ) {
+				if ( ! any { $_->eq( $uri ) } @links ) {
 					push @links, $uri;
 				}
 			}
