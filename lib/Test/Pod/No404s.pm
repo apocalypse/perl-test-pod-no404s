@@ -75,7 +75,10 @@ sub pod_file_ok {
 			my($uri, $orig_uri) = @_;
 			my $scheme = $uri->scheme;
 			if ( defined $scheme and ( $scheme eq 'http' or $scheme eq 'https' ) ) {
-				push @links, [$uri,$orig_uri];
+				# we skip RFC 6761 addresses reserved for testing and etc
+				if ( $uri->host !~ /(?:test|localhost|invalid|example|example\.com|example\.net|example\.org)$/ ) {
+					push @links, [$uri,$orig_uri];
+				}
 			}
 		} );
 		$finder->find( \$output );
