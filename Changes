@@ -1,16 +1,21 @@
-Revision history for Perl extension Test::Pod::No404s
+Revision history for {{$dist->name}}
 
-* 0.03
+{{$NEXT}}
+
+	Dzilified the dist! RJBS++ :)
+	Updates to the automatically-generated files ( thanks RT#76819 )
+
+0.03	0000-00-00T00:00:00Z UTC
 
 	Add invalid POD location for errors
 	Add note about the companion Test::Pod::LinkCheck module
 
-* 0.02
+0.02	0000-00-00T00:00:00Z UTC
 
 	Minor code fixes
 	Fix incorrect Build.PL
 	Re-jigged the export logic so it's more saner
 
-* 0.01
+0.01	0000-00-00T00:00:00Z UTC
 
 	initial release
