@@ -7,7 +7,6 @@ use Pod::Simple::Text;
 use LWP::UserAgent;
 use URI::Find;
 use Test::Pod ();
-use List::MoreUtils qw( any );
 
 # setup our tests and etc
 use Test::Builder;
@@ -76,10 +75,7 @@ sub pod_file_ok {
 			my($uri, $orig_uri) = @_;
 			my $scheme = $uri->scheme;
 			if ( defined $scheme and ( $scheme eq 'http' or $scheme eq 'https' ) ) {
-				# Make sure we have unique links...
-				if ( ! any { $_[0]->eq( $uri ) } @links ) {
-					push @links, [$uri,$orig_uri];
-				}
+				push @links, [$uri,$orig_uri];
 			}
 		} );
 		$finder->find( \$output );
@@ -90,6 +86,7 @@ sub pod_file_ok {
 			my @errors;
 			my $ua = LWP::UserAgent->new;
 			foreach my $l ( @links ) {
+				$Test->diag( "Checking $l->[0]" );
 				my $response = $ua->head( $l->[0] );
 				if ( $response->is_error ) {
 					$ok = 0;
