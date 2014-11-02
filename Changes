@@ -4,6 +4,7 @@ Revision history for {{$dist->name}}
 
 	Dzilified the dist! RJBS++ :)
 	Updates to the automatically-generated files ( thanks RT#76819 )
+	Try to at least output sensible URLs! ( thanks gh-1 )
 
 0.03	0000-00-00T00:00:00Z UTC
 

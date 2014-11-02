@@ -73,12 +73,12 @@ sub pod_file_ok {
 	if ( $parser->doc_has_started ) {
 		my @links;
 		my $finder = URI::Find->new( sub {
-			my $uri = shift;
+			my($uri, $orig_uri) = @_;
 			my $scheme = $uri->scheme;
 			if ( defined $scheme and ( $scheme eq 'http' or $scheme eq 'https' ) ) {
 				# Make sure we have unique links...
-				if ( ! any { $_->eq( $uri ) } @links ) {
-					push @links, $uri;
+				if ( ! any { $_[0]->eq( $uri ) } @links ) {
+					push @links, [$uri,$orig_uri];
 				}
 			}
 		} );
@@ -90,10 +90,10 @@ sub pod_file_ok {
 			my @errors;
 			my $ua = LWP::UserAgent->new;
 			foreach my $l ( @links ) {
-				my $response = $ua->head( $l );
+				my $response = $ua->head( $l->[0] );
 				if ( $response->is_error ) {
 					$ok = 0;
-					push( @errors, [ $l->as_string, $response->status_line ] );
+					push( @errors, [ $l->[1], $response->status_line ] );
 				}
 			}
 
