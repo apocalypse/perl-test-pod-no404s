@@ -18,6 +18,8 @@ our $UA;
 # See LWP::ConnCache->total_capacity
 our $UA_KEEP_ALIVE = 8;
 
+our %CACHE;
+
 # auto-export our 2 subs
 use parent qw( Exporter );
 our @EXPORT = qw( pod_file_ok all_pod_files_ok ); ## no critic ( ProhibitAutomaticExportation )
@@ -99,8 +101,14 @@ sub pod_file_ok {
 			);
 			# Sort links to benefit from connection caching
 			foreach my $l ( sort { $a->[0] cmp $b->[0] } @links ) {
-				$Test->diag( "Checking $l->[0]" );
-				my $response = $UA->head( $l->[0] );
+				my $url = $l->[0];
+				if (exists $CACHE{$url}) {
+					$Test->diag( "Already checked $url" );
+					next
+				}
+				$Test->diag( "Checking $url" );
+				my $response = $UA->head( $url );
+				$CACHE{$url} = $response->code;
 				if ( $response->is_error ) {
 					$ok = 0;
 					push( @errors, [ $l->[1], $response->status_line ] );
