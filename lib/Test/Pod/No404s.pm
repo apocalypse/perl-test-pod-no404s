@@ -14,6 +14,9 @@ my $Test = Test::Builder->new;
 
 # User agent
 our $UA;
+# Number of connections in cache
+# See LWP::ConnCache->total_capacity
+our $UA_KEEP_ALIVE = 8;
 
 # auto-export our 2 subs
 use parent qw( Exporter );
@@ -90,7 +93,10 @@ sub pod_file_ok {
 			# Verify the links!
 			my $ok = 1;
 			my @errors;
-			$UA ||= LWP::UserAgent->new();
+			$UA ||= LWP::UserAgent->new(
+				    env_proxy => 1,
+				    keep_alive => $UA_KEEP_ALIVE,
+			);
 			foreach my $l ( @links ) {
 				$Test->diag( "Checking $l->[0]" );
 				my $response = $UA->head( $l->[0] );
