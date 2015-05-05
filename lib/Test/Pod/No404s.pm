@@ -97,7 +97,8 @@ sub pod_file_ok {
 				    env_proxy => 1,
 				    keep_alive => $UA_KEEP_ALIVE,
 			);
-			foreach my $l ( @links ) {
+			# Sort links to benefit from connection caching
+			foreach my $l ( sort { $a->[0] cmp $b->[0] } @links ) {
 				$Test->diag( "Checking $l->[0]" );
 				my $response = $UA->head( $l->[0] );
 				if ( $response->is_error ) {
