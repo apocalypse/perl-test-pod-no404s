@@ -12,6 +12,9 @@ use Test::Pod ();
 use Test::Builder;
 my $Test = Test::Builder->new;
 
+# User agent
+our $UA;
+
 # auto-export our 2 subs
 use parent qw( Exporter );
 our @EXPORT = qw( pod_file_ok all_pod_files_ok ); ## no critic ( ProhibitAutomaticExportation )
@@ -87,10 +90,10 @@ sub pod_file_ok {
 			# Verify the links!
 			my $ok = 1;
 			my @errors;
-			my $ua = LWP::UserAgent->new;
+			$UA ||= LWP::UserAgent->new();
 			foreach my $l ( @links ) {
 				$Test->diag( "Checking $l->[0]" );
-				my $response = $ua->head( $l->[0] );
+				my $response = $UA->head( $l->[0] );
 				if ( $response->is_error ) {
 					$ok = 0;
 					push( @errors, [ $l->[1], $response->status_line ] );
