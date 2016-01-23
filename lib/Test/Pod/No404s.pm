@@ -12,6 +12,14 @@ use Test::Pod ();
 use Test::Builder;
 my $Test = Test::Builder->new;
 
+# User agent
+our $UA;
+# Number of connections in cache
+# See LWP::ConnCache->total_capacity
+our $UA_KEEP_ALIVE = 8;
+
+our %CACHE;
+
 # auto-export our 2 subs
 use parent qw( Exporter );
 our @EXPORT = qw( pod_file_ok all_pod_files_ok ); ## no critic ( ProhibitAutomaticExportation )
@@ -87,10 +95,28 @@ sub pod_file_ok {
 			# Verify the links!
 			my $ok = 1;
 			my @errors;
-			my $ua = LWP::UserAgent->new;
+			$UA ||= LWP::UserAgent->new(
+				    env_proxy => 1,
+				    keep_alive => $UA_KEEP_ALIVE,
+			);
+			@links = do {
+				# Keep unique links
+				my %links = map { $_->[0] => $_ } @links;
+				# Sort to benefit from connection caching
+				# (link to the same host with the same protocol
+				# will be checked in the same sequence)
+				map { $links{$_} } sort { $a cmp $b } keys %links
+			};
+			# Sort links to benefit from connection caching
 			foreach my $l ( @links ) {
-				$Test->diag( "Checking $l->[0]" );
-				my $response = $ua->head( $l->[0] );
+				my $url = $l->[0];
+				if (exists $CACHE{$url}) {
+					$Test->diag( "Already checked $url" );
+					next
+				}
+				$Test->diag( "Checking $url" );
+				my $response = $UA->head( $url );
+				$CACHE{$url} = $response->code;
 				if ( $response->is_error ) {
 					$ok = 0;
 					push( @errors, [ $l->[1], $response->status_line ] );
