@@ -99,8 +99,16 @@ sub pod_file_ok {
 				    env_proxy => 1,
 				    keep_alive => $UA_KEEP_ALIVE,
 			);
+			@links = do {
+				# Keep unique links
+				my %links = map { $_->[0] => $_ } @links;
+				# Sort to benefit from connection caching
+				# (link to the same host with the same protocol
+				# will be checked in the same sequence)
+				map { $links{$_} } sort { $a cmp $b } keys %links
+			};
 			# Sort links to benefit from connection caching
-			foreach my $l ( sort { $a->[0] cmp $b->[0] } @links ) {
+			foreach my $l ( @links ) {
 				my $url = $l->[0];
 				if (exists $CACHE{$url}) {
 					$Test->diag( "Already checked $url" );
