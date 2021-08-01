@@ -11,6 +11,7 @@ use Test::Pod ();
 # setup our tests and etc
 use Test::Builder;
 my $Test = Test::Builder->new;
+my %ignore_urls;
 
 # auto-export our 2 subs
 use parent qw( Exporter );
@@ -68,6 +69,8 @@ sub pod_file_ok {
 		return 0;
 	}
 
+	_load_ignore_urls();
+
 	# Did we see POD in the file?
 	if ( $parser->doc_has_started ) {
 		my @links;
@@ -109,6 +112,30 @@ sub pod_file_ok {
 	}
 
 	return 1;
+}
+
+sub _load_ignore_urls {
+	return if ( %ignore_urls );
+
+	# Put a dummy item in %ignore_urls to not try to keep loading it over and over.
+	my $dummy = q{#};
+	$ignore_urls{ $dummy } = 1;
+
+	my $config = '.no404s-ignore';
+	$Test->diag( "Trying to load ignore URLs from $config" );
+	if ( -f $config ) {
+		open(my $F, '<', $config) or do {
+			$Test->diag( "Error reading $config: $!" );
+			return;
+		};
+		foreach my $line ( <$F> ) {
+			$line =~ s/^\s+//xms;
+			$line =~ s/\s+$//xms;
+			$ignore_urls{ $line } = 1;
+		}
+		close $F;
+	}
+	return;
 }
 
 =method all_pod_files_ok
